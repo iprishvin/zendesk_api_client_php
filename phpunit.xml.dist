@@ -11,4 +11,9 @@
         <env name="END_USER_PASSWORD" value="" />
         <env name="END_USER_OAUTH_TOKEN" value="" />
     </php>
+    <testsuites>
+        <testsuite name="Zendesk API Test Suites">
+            <directory>./tests/</directory>
+        </testsuite>
+    </testsuites>
 </phpunit>
