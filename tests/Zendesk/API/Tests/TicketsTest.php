@@ -7,31 +7,14 @@ use Zendesk\API\Client;
 /**
  * Tickets test class
  */
-class TicketsTest extends \PHPUnit_Framework_TestCase {
-
-    private $client;
-    private $subdomain;
-    private $username;
-    private $password;
-    private $token;
-    private $oAuthToken;
-
-    public function __construct() {
-        $this->subdomain = $GLOBALS['SUBDOMAIN'];
-        $this->username = $GLOBALS['USERNAME'];
-        $this->password = $GLOBALS['PASSWORD'];
-        $this->token = $GLOBALS['TOKEN'];
-        $this->oAuthToken = $GLOBALS['OAUTH_TOKEN'];
-        $this->client = new Client($this->subdomain, $this->username);
-        $this->client->setAuth('token', $this->token);
-    }
+class TicketsTest extends BasicTest {
 
     public function testCredentials() {
-        $this->assertEquals($GLOBALS['SUBDOMAIN'] != '', true, 'Expecting GLOBALS[SUBDOMAIN] parameter; does phpunit.xml exist?');
-        $this->assertEquals($GLOBALS['TOKEN'] != '', true, 'Expecting GLOBALS[TOKEN] parameter; does phpunit.xml exist?');
-        $this->assertEquals($GLOBALS['PASSWORD'] != '', true, 'Expecting GLOBALS[PASSWORD] parameter; does phpunit.xml exist?');
-        $this->assertEquals($GLOBALS['OAUTH_TOKEN'] != '', true, 'Expecting GLOBALS[OAUTH_TOKEN] parameter; does phpunit.xml exist?');
-        $this->assertEquals($GLOBALS['USERNAME'] != '', true, 'Expecting GLOBALS[USERNAME] parameter; does phpunit.xml exist?');
+        $this->assertEquals($_ENV['SUBDOMAIN'] != '', true, 'Expecting _ENV[SUBDOMAIN] parameter; does phpunit.xml exist?');
+        $this->assertEquals($_ENV['TOKEN'] != '', true, 'Expecting _ENV[TOKEN] parameter; does phpunit.xml exist?');
+        $this->assertEquals($_ENV['PASSWORD'] != '', true, 'Expecting _ENV[PASSWORD] parameter; does phpunit.xml exist?');
+        $this->assertEquals($_ENV['OAUTH_TOKEN'] != '', true, 'Expecting _ENV[OAUTH_TOKEN] parameter; does phpunit.xml exist?');
+        $this->assertEquals($_ENV['USERNAME'] != '', true, 'Expecting _ENV[USERNAME] parameter; does phpunit.xml exist?');
     }
 
     public function testAuthPassword() {
