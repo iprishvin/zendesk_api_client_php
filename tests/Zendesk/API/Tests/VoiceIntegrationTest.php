@@ -16,10 +16,7 @@ class VoiceIntegrationTest extends BasicTest {
     public function testAuthToken() {
         parent::authTokenTest();
     }
-
-    /**
-     * @depends testAuthToken
-     */
+    
     public function testOpenUserProfile() {
         $result = $this->client->voice()->agents()->openUserProfile(array(
             'agent_id' => '1',
@@ -28,9 +25,6 @@ class VoiceIntegrationTest extends BasicTest {
         $this->assertEquals($this->client->getDebug()->lastResponseCode, '200', 'Does not return HTTP code 200');
     }
 
-    /**
-     * @depends testAuthToken
-     */
     public function testOpenTicket() {
         $result = $this->client->voice()->agents()->openTicket(array(
             'agent_id' => '1',
@@ -39,12 +33,8 @@ class VoiceIntegrationTest extends BasicTest {
         $this->assertEquals($this->client->getDebug()->lastResponseCode, '200', 'Does not return HTTP code 200');
     }
 
-    /**
-     * @depends testAuthToken
-     */
     public function testCreateVoiceTicket() {
         $ticket = $this->client->voice()->tickets()->create(array(
-            'display_to_agent' => '1',
             'ticket' => array(
                 'via_id' => 44,
                 'subject' => 'My printer is on fire!',
@@ -61,9 +51,6 @@ class VoiceIntegrationTest extends BasicTest {
         $this->assertEquals($this->client->getDebug()->lastResponseCode, '201', 'Does not return HTTP code 201');
     }
 
-    /**
-     * @depends testAuthToken
-     */
     public function testCreateVoicemailTicket() {
         $ticket = $this->client->voice()->tickets()->create(array(
             'ticket' => array(

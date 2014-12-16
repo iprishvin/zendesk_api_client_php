@@ -17,54 +17,19 @@ class UserIdentitiesTest extends BasicTest {
         parent::authTokenTest();
     }
 
-    /**
-     * @depends testAuthToken
-     */
-    public function testAll() {
-        $identities = $this->client->user(454094082)->identities()->findAll();
-        $this->assertEquals(is_object($identities), true, 'Should return an object');
-        $this->assertEquals(is_array($identities->identities), true, 'Should return an object containing an array called "identities"');
-        $this->assertGreaterThan(0, $identities->identities[0]->id, 'Returns a non-numeric id for identities[0]');
-        $this->assertEquals($this->client->getDebug()->lastResponseCode, '200', 'Does not return HTTP code 200');
-    }
+    protected $id, $user_id;
 
-    /**
-     * @depends testAuthToken
-     */
-    public function testFind() {
-        $identity = $this->client->user(454094082)->identity(463568382)->find(); // don't delete identity #1
-        $this->assertEquals(is_object($identity), true, 'Should return an object');
-        $this->assertGreaterThan(0, $identity->identity->id, 'Returns a non-numeric id for identity');
-        $this->assertEquals($this->client->getDebug()->lastResponseCode, '200', 'Does not return HTTP code 200');
-    }
+    public function setUp() {
 
-    /**
-     * @depends testAuthToken
-     */
-    public function testCreateAsEndUser() {
-        $this->markTestSkipped(
-            'Skipped for now because I need to get a new user account'
-        );
-        $this->username = "roge2@example.org";
-        $identity = $this->client->user(454094082)->identities()->create(array(
-            'end_user' => true,
-            'type' => 'email',
-            'value' => 'foo@bar.com',
+        $user = $this->client->users()->create(array(
+            'name' => 'Roger Wilco',
+            'email' => 'roge@example.org',
+            'role' => 'agent',
             'verified' => true
         ));
-        $this->assertEquals(is_object($identity), true, 'Should return an object');
-        $this->assertEquals(is_object($identity->identity), true, 'Should return an object called "identity"');
-        $this->assertGreaterThan(0, $identity->identity->id, 'Returns a non-numeric id for user field');
-        $this->assertEquals($identity->identity->value, 'foo@bar.com', 'Title of test identity does not match');
-        $this->assertEquals($this->client->getDebug()->lastResponseCode, '201', 'Does not return HTTP code 201');
-        $this->username = $_ENV['USERNAME'];
-    }
+        $this->user_id = $user->user->id;
 
-    /**
-     * @depends testAuthToken
-     */
-    public function testCreate() {
-        $identity = $this->client->user(454094082)->identities()->create(array(
+        $identity = $this->client->user($this->user_id)->identities()->create(array(
             'type' => 'email',
             'value' => 'devaris.brown@zendesk.com'
         ));
@@ -73,60 +38,76 @@ class UserIdentitiesTest extends BasicTest {
         $this->assertGreaterThan(0, $identity->identity->id, 'Returns a non-numeric id for user field');
         $this->assertEquals($identity->identity->value, 'devaris.brown@zendesk.com', 'Title of test identity does not match');
         $this->assertEquals($this->client->getDebug()->lastResponseCode, '201', 'Does not return HTTP code 201');
-        $id = $identity->identity->id;
-        $stack = array($id);
-        return $stack;
+        $this->id = $identity->identity->id;
     }
 
-    /**
-     * @depends testCreate
-     */
-    public function testMarkAsVerified(array $stack) {
-        $id = array_pop($stack);
-        $identity = $this->client->user(454094082)->identity($id)->markAsVerified();
+    public function testCreateAsEndUser() {
+
+        $user = $this->client->users()->create(array(
+            'name' => 'Roger EndUser',
+            'email' => 'roge2@example.org',
+            'role' => 'end-user',
+            'verified' => true
+        ));
+        
+        $this->username = "roge2@example.org";
+        $identity = $this->client->user($user->user->id)->identities()->create(array(
+            'type' => 'email',
+            'value' => 'foo@bar.com'
+        ));
+        $this->assertEquals(is_object($identity), true, 'Should return an object');
+        $this->assertEquals(is_object($identity->identity), true, 'Should return an object called "identity"');
+        $this->assertGreaterThan(0, $identity->identity->id, 'Returns a non-numeric id for user field');
+        $this->assertEquals($identity->identity->value, 'foo@bar.com', 'Title of test identity does not match');
+        $this->assertEquals($this->client->getDebug()->lastResponseCode, '201', 'Does not return HTTP code 201');
+        $this->username = $_ENV['USERNAME'];
+
+        $this->client->user($user->user->id)->delete();
+    }
+
+
+     public function testAll() {
+        $identities = $this->client->user($this->user_id)->identities()->findAll();
+        $this->assertEquals(is_object($identities), true, 'Should return an object');
+        $this->assertEquals(is_array($identities->identities), true, 'Should return an object containing an array called "identities"');
+        $this->assertGreaterThan(0, $identities->identities[0]->id, 'Returns a non-numeric id for identities[0]');
+        $this->assertEquals($this->client->getDebug()->lastResponseCode, '200', 'Does not return HTTP code 200');
+    }
+
+    public function testFind() {
+        $identity = $this->client->user($this->user_id)->identity($this->id)->find(); 
         $this->assertEquals(is_object($identity), true, 'Should return an object');
         $this->assertGreaterThan(0, $identity->identity->id, 'Returns a non-numeric id for identity');
         $this->assertEquals($this->client->getDebug()->lastResponseCode, '200', 'Does not return HTTP code 200');
-        $id = $identity->identity->id;
-        $stack = array($id);
-        return $stack;
     }
 
-    /**
-     * @depends testCreate
-     */
-    public function testMakePrimary(array $stack) {
-        $id = array_pop($stack);
-        $identities = $this->client->user(454094082)->identity($id)->makePrimary();
+    public function testMarkAsVerified() {
+        $identity = $this->client->user($this->user_id)->identity($this->id)->markAsVerified();
+        $this->assertEquals(is_object($identity), true, 'Should return an object');
+        $this->assertGreaterThan(0, $identity->identity->id, 'Returns a non-numeric id for identity');
+        $this->assertEquals($this->client->getDebug()->lastResponseCode, '200', 'Does not return HTTP code 200');
+    }
+
+    public function testMakePrimary() {
+        $identities = $this->client->user($this->user_id)->identity($this->id)->makePrimary();
         $this->assertEquals(is_object($identities), true, 'Should return an object');
         $this->assertGreaterThan(0, $identities->identities[0]->id, 'Returns a non-numeric id for identities[0]');
         $this->assertEquals($this->client->getDebug()->lastResponseCode, '200', 'Does not return HTTP code 200');
         $id = $identities->identities[0]->id;
-        $stack = array($id);
-        return $stack;
     }
 
-    /**
-     * @depends testCreate
-     */
-    public function testRequestVerification(array $stack) {
-        $id = array_pop($stack);
-        $identity = $this->client->user(454094082)->identity($id)->requestVerification();
-        $this->assertEquals($this->client->getDebug()->lastResponseCode, '200', 'Does not return HTTP code 200');
-        $stack = array($id);
-        return $stack;
-    }
-
-    /**
-     * @depends testCreate
-     */
-    public function testDelete(array $stack) {
-        $id = array_pop($stack);
-        $this->assertGreaterThan(0, $id, 'Cannot find a identity id to test with. Did testCreate fail?');
-        $view = $this->client->user(454094082)->identity($id)->delete();
+    public function testRequestVerification() {
+        $identity = $this->client->user($this->user_id)->identity($this->id)->requestVerification();
         $this->assertEquals($this->client->getDebug()->lastResponseCode, '200', 'Does not return HTTP code 200');
     }
 
+    public function tearDown() {
+        $this->assertGreaterThan(0, $this->id, 'Cannot find a identity id to test with. Did testCreate fail?');
+        $view = $this->client->user($this->user_id)->identity($this->id)->delete();
+        $this->assertEquals($this->client->getDebug()->lastResponseCode, '200', 'Does not return HTTP code 200');
+
+        $this->client->user($this->user_id)->delete();
+    }
 
 }
 

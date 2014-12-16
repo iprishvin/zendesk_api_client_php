@@ -17,9 +17,6 @@ class JobStatusesTest extends BasicTest {
         parent::authTokenTest();
     }
 
-    /**
-     * @depends testAuthToken
-     */
     public function testFind() {
         $this->markTestSkipped(
             'Skipped for now because it requires a new job ID each time'

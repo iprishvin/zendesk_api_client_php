@@ -17,15 +17,28 @@ class TicketImportTest extends BasicTest {
         parent::authTokenTest();
     }
 
-    /**
-     * @depends testAuthToken
-     */
+    protected $author_id;
+    
+    public function setUP(){
+        $user = $this->client->users()->create(array(
+            'name' => 'Roger Wilco',
+            'email' => 'roge@example.org',
+            'role' => 'agent',
+            'verified' => true
+        ));
+        $this->author_id = $user->user->id;
+    }
+
+    public function tearDown(){
+        $this->client->user($this->author_id)->delete();
+    }
+
     public function testImport() {
         $confirm = $this->client->tickets()->import(array(
             'subject' => 'Help',
             'description' => 'A description',
             'comments' => array(
-                array('author_id' => 454094082, 'value' => 'This is a comment') // 454094082 is me
+                array('author_id' => $this->author_id, 'value' => 'This is a author comment') // 454094082 is me
             )
         ));
         $this->assertEquals(is_object($confirm), true, 'Should return an object');

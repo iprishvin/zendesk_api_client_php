@@ -17,9 +17,6 @@ class SuspendedTicketsTest extends BasicTest {
         parent::authTokenTest();
     }
 
-    /**
-     * @depends testAuthToken
-     */
     public function testAll() {
         $tickets = $this->client->suspendedTickets()->findAll();
         $this->assertEquals(is_object($tickets), true, 'Should return an object');
@@ -28,9 +25,6 @@ class SuspendedTicketsTest extends BasicTest {
         $this->assertEquals($this->client->getDebug()->lastResponseCode, '200', 'Does not return HTTP code 200');
     }
 
-    /**
-     * @depends testAuthToken
-     */
     public function testFind() {
         $ticket = $this->client->suspendedTicket(205526502)->find(); // don't delete view #210610071
         $this->assertEquals(is_object($ticket), true, 'Should return an object');
@@ -39,9 +33,6 @@ class SuspendedTicketsTest extends BasicTest {
         $this->assertEquals($this->client->getDebug()->lastResponseCode, '200', 'Does not return HTTP code 200');
     }
 
-    /**
-     * @depends testAuthToken
-     */
     public function testRecover() {
         $this->markTestSkipped(
             'The only way to recover a ticket is to suspend it first (but that would result in a suspended user too)'
@@ -53,9 +44,6 @@ class SuspendedTicketsTest extends BasicTest {
         $this->assertEquals($this->client->getDebug()->lastResponseCode, '200', 'Does not return HTTP code 200');
     }
 
-    /**
-     * @depends testAuthToken
-     */
     public function testDelete() {
         $this->markTestSkipped(
             'The only way to delete a suspended ticket is to suspend it first (but that would result in a suspended user too)'
